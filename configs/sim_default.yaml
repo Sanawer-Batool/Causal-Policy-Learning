@@ -1,0 +1,9 @@
+# Default simulator configuration (Architecture Rev.2, Section 4)
+kappa: 1.0     # strength of U -> T (hidden confounding via assignment)
+eta: 1.0       # strength of U -> Y (hidden confounding via outcome)
+rho: 1.0       # sharpness of the logging policy (overlap)
+eps: 0.02      # propensity floor (overlap)
+nu: 0.5        # std-dev of log basket value (outcome noise)
+costs: [0.0, 0.3, 0.8, 1.5]   # c_a for actions 0..3
+# Average spend per customer. PLACEHOLDERS: calibrated in Phase 5.
+budget_levels: {tight: 0.08, medium: 0.18, generous: 0.30}
