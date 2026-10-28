@@ -15,7 +15,7 @@ from cpl.uncertainty import (
 )
 
 
-def audit_one(name, setting, seed, B, scheme, n_jobs=1):
+def audit_one(name, setting, seed, B, scheme, n_jobs=1, save_intervals=False):
     X, T, Y, Xo, tau = load_scenario(setting, seed)
     t0 = time.time()
     if name == "Forest":
@@ -44,6 +44,13 @@ def audit_one(name, setting, seed, B, scheme, n_jobs=1):
         B=B,
         runtime_s=round(time.time() - t0, 1),
     )
+    if save_intervals:
+        out["intervals"] = {
+            "tau_true": tau.tolist(),
+            "lo": lo.tolist(),
+            "hi": hi.tolist(),
+        }
+        out["y_sd_dev"] = float(np.std(Y, ddof=1))
     return out
 
 
@@ -55,6 +62,7 @@ if __name__ == "__main__":
     ap.add_argument("--schemes", nargs="+", default=["bootstrap"])
     ap.add_argument("--B", type=int, default=30)
     ap.add_argument("--n_jobs", type=int, default=1)
+    ap.add_argument("--save_intervals", action="store_true")
     ap.add_argument("--out", default="results/phase4_audit.json")
     a = ap.parse_args()
     rows = []
@@ -62,7 +70,17 @@ if __name__ == "__main__":
         for st in a.settings:
             for m in a.methods:
                 for sch in (["native"] if m == "Forest" else a.schemes):
-                    rows.append(audit_one(m, st, s, a.B, sch, a.n_jobs))
+                    rows.append(
+                        audit_one(
+                            m,
+                            st,
+                            s,
+                            a.B,
+                            sch,
+                            a.n_jobs,
+                            save_intervals=a.save_intervals,
+                        )
+                    )
                     print(
                         m,
                         st,
